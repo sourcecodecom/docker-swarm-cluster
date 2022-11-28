@@ -1,0 +1,23 @@
+type: install
+jpsVersion: '1.0.0'
+name: Docker Swarm Custom
+id: docker-swarm-custom
+
+description:
+  text: docker swarm custom
+  short: docker swarm custom
+
+baseUrl: https://bitbucket.org/dewawebdevteam1/docker-swarm-custom/src/master
+
+globals:
+  REGISTRY_USER: registry
+  REGISTRY_PASSWORD: 4y6iq?2TmV+Zzmy|
+  REGISTRY_URL: registry.dewaweb.com
+
+nodes:
+  - nodeType: nginx-dockerized
+    nodeGroup: bl
+    fixedCloudlets: 5
+    cloudlets: 8
+    isSLBAccessEnabled: false
+   
