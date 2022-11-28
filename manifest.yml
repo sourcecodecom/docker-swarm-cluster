@@ -7,7 +7,7 @@ description:
   text: docker swarm custom
   short: docker swarm custom
 
-baseUrl: https://bitbucket.org/dewawebdevteam1/docker-swarm-custom/src/master
+baseUrl: https://raw.githubusercontent.com/sourcecodecom/docker-swarm-cluster/main
 
 globals:
   REGISTRY_USER: registry
