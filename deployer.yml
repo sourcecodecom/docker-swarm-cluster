@@ -32,7 +32,7 @@ nodes:
     nodeGroup: worker
 
 onInstall:
-  - install: /addons/docker-swarm-init.jps?_r=${fn.random}
+  - install: /addons/docker-swarm-init.yml
   - get-tokens
 
 actions:
