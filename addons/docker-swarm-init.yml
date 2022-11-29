@@ -1,0 +1,169 @@
+type: update
+id: docker-swarm-init
+name: docker swarm init
+baseUrl: https://raw.githubusercontent.com/sourcecodecom/docker-swarm-cluster/main/addons
+
+onInstall:
+  - if (${settings.clone:false}):
+      - cmd [${nodes.vps.master.id}]: grep -oP 'addr":"\K.*?(?=:2377)' < /var/lib/docker/swarm/state.json | paste -s -d,
+      - setGlobals:
+          oldIntIPs: ${response.out}
+      - cmd [${nodes.vps.master.id}]: grep -oP 'node_id":"\K.*?(?=")' < /var/lib/docker/swarm/state.json | paste -s -d,
+      - setGlobals:
+          oldNIDs: ${response.out}
+      - nat:
+          ids: vps,worker
+          act: A
+  - env.control.ExecDockerRunCmd[*]
+  - log: Swarm Init    
+  - init-swarm
+  - if (${settings.clone:false} && nodes.vps.length > 1):
+      - get-ids: nodes.vps
+      - removeNode:
+          id: ${globals.ids}
+          manager: true
+      - cmd [${globals.ids}]: |-
+          yes | rm -rf /var/lib/docker/swarm
+      - cmd [${nodes.vps.master.id}]: |-
+          IFS=',' read -ra ids <<< ${globals.oldNIDs}
+          for id in "${ids[@]}"; do
+            docker node rm --force $id &>> /var/log/run.log || echo "NODE RM ERR: $id"   
+          done
+  - build-cluster
+  - if (${settings.clone:false}):
+      - cmd [${nodes.vps.master.id}]: |-
+          docker node ls
+      - forEach(nodes.vps):
+          - restartContainer[${@i.id}]
+          - sleep: 5000
+      - forEach(nodes.worker):
+          - restartContainer[${@i.id}]
+          - sleep: 5000
+
+onAfterClone:
+  - if (!${settings.clone:false}):
+      re-init-swarm: ${event.response.env.envName}
+
+onAfterScaleOut[worker]:
+  - get-ids: event.response.nodes
+  - if (${settings.clone:false}):
+      nat: 
+        ids: ${globals.ids}
+        act: A
+  - get-worker-token
+  - connectNode: 
+      id: ${globals.ids}
+      token: ${globals.worker-token}
+
+onAfterScaleOut[vps]:
+  - get-ids: event.response.nodes
+  - if (${settings.clone:false}):
+      nat:
+        ids: ${globals.ids}
+        act: A
+  - get-manager-token
+  - connectNode:
+      id: ${globals.ids}
+      token: ${globals.manager-token}
+
+onBeforeScaleIn[vps]:
+  - get-ids: event.response.nodes
+  - removeNode:
+      id: ${globals.ids}
+      manager: true
+
+onBeforeScaleIn[worker]:
+  - get-ids: event.response.nodes
+  - removeNode:
+      id: ${globals.ids}
+
+actions:
+  add-id:
+    setGlobals:
+      ids: ${globals.ids:}${globals.sep:}${this}
+      sep: ','
+
+  build-cluster:
+    - if (nodes.vps.length > 1):
+      - log: Connecting Manager Nodes
+      - get-ids: nodes.vps
+      - get-manager-token
+      - connectNode:
+          id: ${globals.ids}
+          token: ${globals.manager-token}
+      
+    - log: Connecting Worker Nodes
+    - get-worker-token
+    - connectNode:
+        id: worker
+        token: ${globals.worker-token}
+    - if (false && ${settings.clone:false}):
+        - sleep: 10000
+        - cmd[${nodes.vps.master.id}]: |-
+            docker node ls
+            nodes=$(docker node ls | awk '/Down|Unknown/' | awk '{print $1}')
+            for n in $nodes; do docker node rm $n; done
+
+  connectNode:
+    cmd [${this.id}]: |-
+      log=/var/log/run.log
+      join="docker swarm join --token ${this.token} ${nodes.vps.master.intIP}:2377"
+      for (( i=1; i<=10; i++)); do
+        attempt="Join attempt #$i"
+        echo $attempt
+        echo $attempt >> $log
+        $join &>> $log && { break; } || { sleep 15; }
+        echo "$info" | grep swarm
+        ! echo "$info" | grep -E "Error|Swarm: inactive" && { break; } || { service docker restart && sleep 15 && $leave &>> $log; }
+      done
+      echo "Moving forward"
+      echo "Moving forward" >> $log
+
+  get-ids:
+    - setGlobals:
+        ids: ''
+        sep: ''
+    - forEach(${this}):
+        if (${@i.id} != ${nodes.vps.master.id}):
+          add-id: ${@i.id}
+
+  get-manager-token:
+    - cmd [${nodes.vps.master.id}]: docker swarm join-token -q manager
+    - setGlobals:
+        manager-token: ${response.out}
+
+  get-worker-token:
+    - cmd [${nodes.vps.master.id}]: docker swarm join-token -q worker
+    - setGlobals:
+        worker-token: ${response.out}
+
+  init-swarm:
+    cmd [${nodes.vps.master.id}]: |-
+      log=/var/log/run.log
+      echo -e "\n\n-------------\n$(date) -> Init Swarm: --force-new-cluster --advertise-addr ${nodes.vps.master.intIP}" >> $log
+      init="docker swarm init --force-new-cluster --advertise-addr ${nodes.vps.master.intIP}"
+      $init &>> $log || { service docker restart && sleep 10 && $init >> $log; }
+
+  nat:
+    cmd [${this.ids}]: |-
+      IFS=',' read -ra ips <<< ${globals.oldIntIPs:}
+      for ip in "${ips[@]}"; do
+        iptables -t nat -${this.act} OUTPUT -p tcp -d $ip -j DNAT --to-destination ${nodes.vps.master.intIP}
+        service iptables save
+      done
+
+  re-init-swarm:
+    - install:
+        jps: /docker-swarm-init.jps
+        envName: ${this}
+        settings:
+          clone: true
+
+  removeNode:
+    - cmd [${this.id}]: -|
+        log=/var/log/run.log
+        nid=$(docker info 2> /dev/null | grep NodeID | awk '{print $2}')
+        [ ${this.manager:false} = true ] && docker node demote $(hostname) &>> $log
+        docker swarm leave --force &>> $log
+        echo $nid
+

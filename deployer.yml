@@ -13,6 +13,7 @@ globals:
   REGISTRY_USER: registry
   REGISTRY_PASSWORD: 4y6iq?2TmV+Zzmy|
   REGISTRY_URL: registry.dewaweb.com
+  startPage: http://${env.domain}/
 
 nodes:
   # - nodeType: nginx-dockerized
@@ -23,9 +24,25 @@ nodes:
   - nodeType: dockerengine
     cloudlets: 32
     tag: 20.10.21
+    nodeGroup: vps
 
   - nodeType: dockerengine
     cloudlets: 32
     tag: 20.10.21
+    count: 2
     nodeGroup: worker
+
+onInstall:
+  - install: /addons/docker-swarm-init.jps?_r=${fn.random}
+  - get-tokens
+
+actions:
+  get-tokens:
+    - cmd[${nodes.vps.master.id}]: docker swarm join-token -q worker
+    - setGlobals:
+        worker-token: ${response.out}
+
+startPage: ${globals.startPage}
+
+
    
