@@ -154,7 +154,7 @@ actions:
 
   re-init-swarm:
     - install:
-        jps: /docker-swarm-init.jps
+        jps: /docker-swarm-init.yml
         envName: ${this}
         settings:
           clone: true
@@ -166,4 +166,9 @@ actions:
         [ ${this.manager:false} = true ] && docker node demote $(hostname) &>> $log
         docker swarm leave --force &>> $log
         echo $nid
+    - cmd[${nodes.cp.master.id}]: |-
+        IFS=',' read -ra node <<< ${this.id}
+        for id in "${node[@]}"; do
+          docker node rm --force node$id-${env.domain} &>> /var/log/run.log || echo "NODE RM ERR: node$id-${env.domain}"   
+        done
 
