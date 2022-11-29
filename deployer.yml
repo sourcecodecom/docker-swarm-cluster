@@ -13,7 +13,7 @@ globals:
   REGISTRY_USER: registry
   REGISTRY_PASSWORD: 4y6iq?2TmV+Zzmy|
   REGISTRY_URL: registry.dewaweb.com
-  startPage: http://${env.domain}/
+  startPage: "http://${env.domain}/"
 
 nodes:
   # - nodeType: nginx-dockerized
