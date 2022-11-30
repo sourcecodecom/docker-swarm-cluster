@@ -13,6 +13,14 @@ globals:
   REGISTRY_USER: registry
   REGISTRY_PASSWORD: 4y6iq?2TmV+Zzmy|
   REGISTRY_URL: registry.dewaweb.com
+  REPLICATION_MODE: master
+  REPLICATION_USER: repl
+  REPLICATION_PASSWORD: repl12345
+  MARIADB_ROOT_PASSWORD: test12345
+  MARIADB_MASTER_HOST: mariadb-master
+  DOCKER_MASTER_HOSTNAME: ${nodes.worker[0].id}
+  DOCKER_SLAVE_HOSTNAME: ${nodes.worker[1].id}
+  MARIADB_COMPOSE_FILE: /opt/services/mysql-repl/docker-compose.yml
 
 nodes:
   - nodeType: nginx-dockerized
@@ -88,6 +96,7 @@ onInstall:
   - install: /addons/docker-swarm-init.yml
   - get-tokens
   - pull-bitnami-mariadb
+  - setup-docker-stack
 
 actions:
   get-tokens:
@@ -98,5 +107,21 @@ actions:
   pull-bitnami-mariadb:
     - cmd [${nodes.vps.master.id}]: docker pull bitnami/mariadb:10.1.29-r2
 
-  
+  setup-docker-stack:
+    - cmd [${nodes.vps.master.id}]: |-
+        wget ${baseUrl}/scripts/mysql-repl/docker-compose.yml -O ${globals.MARIADB_COMPOSE_FILE} &>> /var/log/run.log
+        sed -i "s/replication_mode/${globals.REPLICATION_MODE}/" ${globals.MARIADB_COMPOSE_FILE}
+        sed -i "s/replication_user/${globals.REPLICATION_USER}/" ${globals.MARIADB_COMPOSE_FILE}
+        sed -i "s/replication_password/${globals.REPLICATION_PASSWORD/" ${globals.MARIADB_COMPOSE_FILE}
+        sed -i "s/mariadb_root_password/${globals.MARIADB_ROOT_PASSWORD}/" ${globals.MARIADB_COMPOSE_FILE}
+        sed -i "s/mariadb_master_host/${globals.MARIADB_MASTER_HOST}/" ${globals.MARIADB_COMPOSE_FILE}
+        sed -i "s/docker_master_hostname/${globals.DOCKER_MASTER_HOSTNAME}/" ${globals.MARIADB_COMPOSE_FILE}
+        sed -i "s/docker_slave_hostname/${globals.DOCKER_SLAVE_HOSTNAME}/" ${globals.MARIADB_COMPOSE_FILE}
+
+    - cmd [${nodes.vps.master.id}]: docker stack deploy -c ${globals.MARIADB_COMPOSE_FILE} mysql
+
+    
+
+
+
    
