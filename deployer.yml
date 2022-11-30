@@ -109,18 +109,18 @@ actions:
 
   setup-docker-stack:
     - cmd [${nodes.vps.master.id}]: |-
-        wget ${baseUrl}/scripts/mysql-repl/docker-compose.yml -O ${globals.MARIADB_COMPOSE_FILE} &>> /var/log/run.log
-        sed -i "s/replication_mode/${globals.REPLICATION_MODE}/" ${globals.MARIADB_COMPOSE_FILE}
-        sed -i "s/replication_user/${globals.REPLICATION_USER}/" ${globals.MARIADB_COMPOSE_FILE}
-        sed -i "s/replication_password/${globals.REPLICATION_PASSWORD/" ${globals.MARIADB_COMPOSE_FILE}
-        sed -i "s/mariadb_root_password/${globals.MARIADB_ROOT_PASSWORD}/" ${globals.MARIADB_COMPOSE_FILE}
-        sed -i "s/mariadb_master_host/${globals.MARIADB_MASTER_HOST}/" ${globals.MARIADB_COMPOSE_FILE}
-        sed -i "s/docker_master_hostname/${globals.DOCKER_MASTER_HOSTNAME}/" ${globals.MARIADB_COMPOSE_FILE}
-        sed -i "s/docker_slave_hostname/${globals.DOCKER_SLAVE_HOSTNAME}/" ${globals.MARIADB_COMPOSE_FILE}
+        wget ${baseUrl}/scripts/mysql-repl/docker-compose.yml -O /opt/services/mysql-repl/docker-compose.yml &>> /var/log/run.log
+        sed -i "s/replication_mode/${globals.REPLICATION_MODE}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/replication_user/${globals.REPLICATION_USER}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/replication_password/${globals.REPLICATION_PASSWORD/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/mariadb_root_password/${globals.MARIADB_ROOT_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/mariadb_master_host/${globals.MARIADB_MASTER_HOST}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/docker_master_hostname/${globals.DOCKER_MASTER_HOSTNAME}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/docker_slave_hostname/${globals.DOCKER_SLAVE_HOSTNAME}/" /opt/services/mysql-repl/docker-compose.yml
 
-    - cmd [${nodes.vps.master.id}]: docker stack deploy -c ${globals.MARIADB_COMPOSE_FILE} mysql
+    - cmd [${nodes.vps.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
 
-    
+
 
 
 
