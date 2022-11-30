@@ -23,63 +23,63 @@ globals:
   MARIADB_COMPOSE_FILE: /opt/services/mysql-repl/docker-compose.yml
 
 nodes:
-  - nodeType: nginx-dockerized
-    nodeGroup: bl
-    fixedCloudlets: 5
-    cloudlets: 8
-    isSLBAccessEnabled: false
+  # - nodeType: nginx-dockerized
+  #   nodeGroup: bl
+  #   fixedCloudlets: 5
+  #   cloudlets: 8
+  #   isSLBAccessEnabled: false
 
-  - nodeType: docker
-    nodeGroup: cp
-    image: jelastic/nginxphp_1.16.0-php-7.0.33:2
-    registry:
-      user: ${globals.REGISTRY_USER}
-      password: ${globals.REGISTRY_PASSWORD}
-      url: ${globals.REGISTRY_URL}
-    scalingMode: STATEFUL
-    fixedCloudlets: 5
-    cloudlets: 8
-    volumes:
-    - /var/spool/cron
-    volumeMounts:
-      /var/www/webroot:
-        protocol: NFS
-        readOnly: false
-        sourcePath: /data/ROOT
-        sourceNodeGroup: storage
-        sourceNodeId: "${nodes.storage[0].id}"
-      /etc/nginx:
-        protocol: NFS
-        readOnly: true
-        sourcePath: /data/nginx
-        sourceNodeGroup: storage
-        sourceNodeId: "${nodes.storage[0].id}"
-      /var/spool/cron:
-        protocol: NFS
-        readOnly: false
-        sourcePath: /data/cron
-        sourceNodeGroup: storage
-        sourceNodeId: "${nodes.storage[0].id}"
-    links:
-    - memcached:MEMCACHED
-    - proxy:PROXYSQL
+  # - nodeType: docker
+  #   nodeGroup: cp
+  #   image: jelastic/nginxphp_1.16.0-php-7.0.33:2
+  #   registry:
+  #     user: ${globals.REGISTRY_USER}
+  #     password: ${globals.REGISTRY_PASSWORD}
+  #     url: ${globals.REGISTRY_URL}
+  #   scalingMode: STATEFUL
+  #   fixedCloudlets: 5
+  #   cloudlets: 8
+  #   volumes:
+  #   - /var/spool/cron
+  #   volumeMounts:
+  #     /var/www/webroot:
+  #       protocol: NFS
+  #       readOnly: false
+  #       sourcePath: /data/ROOT
+  #       sourceNodeGroup: storage
+  #       sourceNodeId: "${nodes.storage[0].id}"
+  #     /etc/nginx:
+  #       protocol: NFS
+  #       readOnly: true
+  #       sourcePath: /data/nginx
+  #       sourceNodeGroup: storage
+  #       sourceNodeId: "${nodes.storage[0].id}"
+  #     /var/spool/cron:
+  #       protocol: NFS
+  #       readOnly: false
+  #       sourcePath: /data/cron
+  #       sourceNodeGroup: storage
+  #       sourceNodeId: "${nodes.storage[0].id}"
+  #   links:
+  #   - memcached:MEMCACHED
+  #   - proxy:PROXYSQL
   
-  - nodeType: memcached
-    nodeGroup: memcached
-    fixedCloudlets: 5
-    cloudlets: 8
+  # - nodeType: memcached
+  #   nodeGroup: memcached
+  #   fixedCloudlets: 5
+  #   cloudlets: 8
 
-  - nodeType: storage
-    nodeGroup: storage
-    fixedCloudlets: 5
-    cloudlets: 8
-    cluster: true
+  # - nodeType: storage
+  #   nodeGroup: storage
+  #   fixedCloudlets: 5
+  #   cloudlets: 8
+  #   cluster: true
 
-  - nodeType: proxysql
-    nodeGroup: proxy
-    count: 2
-    cloudlets: 16
-    fixedCloudlets: 3
+  # - nodeType: proxysql
+  #   nodeGroup: proxy
+  #   count: 2
+  #   cloudlets: 16
+  #   fixedCloudlets: 3
 
   - nodeType: dockerengine
     cloudlets: 32
