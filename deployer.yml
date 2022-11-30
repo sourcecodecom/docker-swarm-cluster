@@ -114,11 +114,12 @@ actions:
         sed -i "s/replication_mode/${globals.REPLICATION_MODE}/" /opt/services/mysql-repl/docker-compose.yml
         sed -i "s/replication_user/${globals.REPLICATION_USER}/" /opt/services/mysql-repl/docker-compose.yml
         sed -i "s/replication_password/${globals.REPLICATION_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
-        sed -i "s/mariadb_root_password/test12345/" /opt/services/mysql-repl/docker-compose.yml
-        sed -i "s/mariadb_master_host/mariadb-master/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/mariadb_root_password/${globals.MARIADB_ROOT_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/mariadb_master_host/${globals.MARIADB_MASTER_HOST}/" /opt/services/mysql-repl/docker-compose.yml
         sed -i "s/docker_master_hostname/node${globals.DOCKER_MASTER_HOSTNAME}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
         sed -i "s/docker_slave_hostname/node${globals.DOCKER_SLAVE_HOSTNAME}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
-        docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
+    
+    - cmd [${nodes.vps.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
 
 
 

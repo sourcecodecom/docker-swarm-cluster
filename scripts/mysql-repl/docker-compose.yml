@@ -22,6 +22,7 @@ services:
     - MARIADB_REPLICATION_MODE=replication_mode
     - MARIADB_REPLICATION_USER=replication_user
     - MARIADB_REPLICATION_PASSWORD=replication_password
+    - MARIADB_ROOT_PASSWORD=mariadb_root_password
     - MARIADB_MASTER_HOST=mariadb_master_host
     - MARIADB_MASTER_ROOT_PASSWORD=mariadb_root_password
     deploy:
