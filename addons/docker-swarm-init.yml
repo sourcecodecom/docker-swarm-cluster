@@ -160,7 +160,7 @@ actions:
           clone: true
 
   removeNode:
-    - cmd [${this.id}]: -|
+    - cmd [${this.id}]: |-
         log=/var/log/run.log
         nid=$(docker info 2> /dev/null | grep NodeID | awk '{print $2}')
         [ ${this.manager:false} = true ] && docker node demote $(hostname) &>> $log
