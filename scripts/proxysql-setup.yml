@@ -16,7 +16,7 @@ onInstall:
  - setupOrchestrator
  - setupProxySQL
  - forEach(i:nodes.worker):
-    - if (${@i.ismaster}):
+    - if (${@i.id} == ${nodes.worker[0].id}):
         addMaster:
           id: ${@i.id}
     - addSlave:
