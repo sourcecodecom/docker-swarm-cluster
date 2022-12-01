@@ -18,7 +18,7 @@ globals:
   MARIADB_ROOT_PASSWORD: test12345
   MARIADB_MASTER_HOST: mariadb-master
   DOCKER_MASTER_HOSTNAME: ${nodes.vds.master.id}
-  DOCKER_SLAVE_HOSTNAME: ${nodes.vds[2].id}
+  DOCKER_SLAVE_HOSTNAME: ${nodes.vds[1].id}
   MARIADB_COMPOSE_FILE: /opt/services/mysql-repl/docker-compose.yml
 
 nodes:
