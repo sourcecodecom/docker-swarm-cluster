@@ -74,4 +74,5 @@ actions:
         sudo sed -i -e 's|HTTP_Auth_User|admin|g' /etc/orchestrator.conf.json
         sudo sed -i -e 's|HTTP_Auth_Password|${globals.ORCHESTRATOR_PASSWORD}|g' /etc/orchestrator.conf.json
         sudo systemctl restart orchestrator
+      user: root
 
