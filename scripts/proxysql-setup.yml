@@ -15,14 +15,12 @@ onInstall:
  - resetProxyNodes
  - setupOrchestrator
  - setupProxySQL
- - forEach(i:nodes.worker):
-    - if (${@i.ismaster}):
-        - addMaster:
-            id: "${@i.id}"
-        - addSlave:
-            id: "${@i.id}"
-    - addSlave:
-        id: "${@i.id}"
+ - addMaster:
+     id: "${nodes.worker.master.id}"
+ - addSlave:
+     id: "${nodes.worker.master.id}"
+ - addSlave:
+     id: "${nodes.worker.last.id}"
 
 actions:
   addMaster:
