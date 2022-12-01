@@ -7,9 +7,9 @@ services:
     - 3306:3306
     environment:
     - MARIADB_REPLICATION_MODE=master
-    - MARIADB_REPLICATION_USER=repl
-    - MARIADB_REPLICATION_PASSWORD=repl12345
-    - MARIADB_ROOT_PASSWORD=test12345
+    - MARIADB_REPLICATION_USER=replication_user
+    - MARIADB_REPLICATION_PASSWORD=replication_password
+    - MARIADB_ROOT_PASSWORD=mariadb_root_password
     deploy:
       placement:
         constraints:
@@ -19,11 +19,11 @@ services:
     ports:
     - 3307:3306
     environment:
-    - MARIADB_REPLICATION_MODE=master
-    - MARIADB_REPLICATION_USER=repl
-    - MARIADB_REPLICATION_PASSWORD=repl12345
-    - MARIADB_MASTER_HOST=mariadb-master
-    - MARIADB_MASTER_ROOT_PASSWORD=test12345
+    - MARIADB_REPLICATION_MODE=slave
+    - MARIADB_REPLICATION_USER=replication_user
+    - MARIADB_REPLICATION_PASSWORD=replication_password
+    - MARIADB_MASTER_HOST=mariadb_master_host
+    - MARIADB_MASTER_ROOT_PASSWORD=mariadb_root_password
     deploy:
       placement:
         constraints:
