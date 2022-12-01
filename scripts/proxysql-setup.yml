@@ -19,15 +19,17 @@ onInstall:
     id: "${nodes.vds[0].id}"
  - addSlave:
     id: "${nodes.vds[1].id}"
- - addSlave:
-    id: "${nodes.vds[1].id}"
 
 actions:
   addMaster:
-    cmd [proxy]: |-
-      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "INSERT INTO mysql_servers (hostgroup_id, hostname, port) VALUES (10, 'node${this.id}', 3306);"
-      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin  -e "LOAD MYSQL SERVERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;"
-    user: root
+    - cmd [proxy]: |-
+        MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "INSERT INTO mysql_servers (hostgroup_id, hostname, port) VALUES (10, 'node${this.id}', 3306);"
+        MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin  -e "LOAD MYSQL SERVERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;"
+      user: root
+    - cmd [proxy]: |-
+        MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin  -e "INSERT INTO mysql_servers (hostgroup_id, hostname, port, max_replication_lag) VALUES (11, 'node${this.id}', 3306, '${globals.MAX_REPL_LAG}');"
+        MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin  -e "LOAD MYSQL SERVERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;"
+      user: root
 
   addSlave:
     cmd [proxy]: |-
