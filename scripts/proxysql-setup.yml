@@ -20,7 +20,7 @@ onInstall:
  - addSlave:
     id: "${nodes.vds[1].id}"
  - addSlave:
-    id: "${nodes.vds[1].id"
+    id: "${nodes.vds[1].id}"
 
 actions:
   addMaster:
