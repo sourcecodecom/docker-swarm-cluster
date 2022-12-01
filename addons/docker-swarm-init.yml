@@ -12,7 +12,7 @@ onInstall:
       - setGlobals:
           oldNIDs: ${response.out}
       - nat:
-          ids: vps,worker
+          ids: vps,vds
           act: A
   - env.control.ExecDockerRunCmd[*]
   - log: Swarm Init    
@@ -36,7 +36,7 @@ onInstall:
       - forEach(nodes.vps):
           - restartContainer[${@i.id}]
           - sleep: 5000
-      - forEach(nodes.worker):
+      - forEach(nodes.vds):
           - restartContainer[${@i.id}]
           - sleep: 5000
 
@@ -44,7 +44,7 @@ onAfterClone:
   - if (!${settings.clone:false}):
       re-init-swarm: ${event.response.env.envName}
 
-onAfterScaleOut[worker]:
+onAfterScaleOut[vds]:
   - get-ids: event.response.nodes
   - if (${settings.clone:false}):
       nat: 
@@ -72,7 +72,7 @@ onBeforeScaleIn[vps]:
       id: ${globals.ids}
       manager: true
 
-onBeforeScaleIn[worker]:
+onBeforeScaleIn[vds]:
   - get-ids: event.response.nodes
   - removeNode:
       id: ${globals.ids}
@@ -95,7 +95,7 @@ actions:
     - log: Connecting Worker Nodes
     - get-worker-token
     - connectNode:
-        id: worker
+        id: vds
         token: ${globals.worker-token}
     - if (false && ${settings.clone:false}):
         - sleep: 10000

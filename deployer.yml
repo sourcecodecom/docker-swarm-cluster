@@ -17,8 +17,8 @@ globals:
   REPLICATION_PASSWORD: repl12345
   MARIADB_ROOT_PASSWORD: test12345
   MARIADB_MASTER_HOST: mariadb-master
-  DOCKER_MASTER_HOSTNAME: ${nodes.worker.master.id}
-  DOCKER_SLAVE_HOSTNAME: ${nodes.worker.last.id}
+  DOCKER_MASTER_HOSTNAME: ${nodes.vds.master.id}
+  DOCKER_SLAVE_HOSTNAME: ${nodes.vds[2].id}
   MARIADB_COMPOSE_FILE: /opt/services/mysql-repl/docker-compose.yml
 
 nodes:
@@ -90,7 +90,7 @@ nodes:
     cloudlets: 32
     tag: 20.10.21
     count: 2
-    nodeGroup: worker
+    nodeGroup: vds
     displayName: MySQL Nodes
 
 onInstall:
