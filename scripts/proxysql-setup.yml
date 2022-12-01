@@ -11,6 +11,40 @@ globals:
   PATH: ${settings.path}
   MAX_REPL_LAG: 20
 
+onAfterScaleOut[vds]:
+  forEach(event.response.nodes):
+    - addSlave:
+        id: "${@i.id}"
+
+onBeforeScaleIn[vds]:
+  forEach(event.response.nodes)
+    - removeSlave:
+        id: "${@i.id}"
+
+onAfterScaleIn[vds]:
+  forEach(event.response.nodes):
+    cmd[proxy]: MYSQL_PWD=${globals.ORCHESTRATOR_PASSWORD} mysql -h 127.0.0.1 -P3360 -uadmin -e "DELETE FROM orchestrator.database_instance where hostname='node${@i.id}-${env.domain}';"
+
+onAfterClone:
+  install: ${globals.PATH}/scripts/proxysql-setup.yml
+  envName: ${event.response.env.envName}
+  nodeGroup: vds
+  settings:
+    db_root_password: ${globals.MARIADB_ROOT_PASSWORD}
+    replication_user: ${globals.REPLICATION_USER}
+    replication_password: ${globals.REPLICATION_PASSWORD}
+    path: ${baseUrl}
+
+onAfterMigrate:
+  install: ${globals.PATH}/scripts/proxysql-setup.yml
+  envName: ${event.response.env.envName}
+  nodeGroup: vds
+  settings:
+    db_root_password: ${globals.MARIADB_ROOT_PASSWORD}
+    replication_user: ${globals.REPLICATION_USER}
+    replication_password: ${globals.REPLICATION_PASSWORD}
+    path: ${baseUrl}
+
 onInstall:
  - resetProxyNodes
  - setupOrchestrator
@@ -35,6 +69,12 @@ actions:
     cmd [proxy]: |-
       MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin  -e "INSERT INTO mysql_servers (hostgroup_id, hostname, port, max_replication_lag) VALUES (11, 'node${this.id}', 3307, '${globals.MAX_REPL_LAG}');"
       MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin  -e "LOAD MYSQL SERVERS TO RUNTIME;SAVE MYSQL SERVERS TO DISK;"
+
+  removeSlave:
+    cmd [proxy]: |-
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin  -e "DELETE FROM mysql_servers WHERE hostname = 'node${this.id}';"
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin  -e "LOAD MYSQL SERVERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;"
+      MYSQL_PWD=${globals.ORCH_PASS} mysql -h 127.0.0.1 -P3360 -uadmin  -e "DELETE FROM orchestrator.database_instance where hostname='node${this.id}-${env.domain}';"
 
   resetProxyNodes:
     cmd [proxy]: |-
