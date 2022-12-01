@@ -111,6 +111,8 @@ actions:
     - cmd [${nodes.vps.master.id}]: |-
         mkdir -p /opt/services/mysql-repl
         wget ${baseUrl}/scripts/mysql-repl/docker-compose.yml -O /opt/services/mysql-repl/docker-compose.yml &>> /var/log/run.log
+        sed -i "s/docker_master_hostname/node${globals.DOCKER_MASTER_HOSTNAME}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/docker_slave_hostname/node${globals.DOCKER_SLAVE_HOSTNAME}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
     
     - cmd [${nodes.vps.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
 
