@@ -74,11 +74,12 @@ nodes:
   #   cloudlets: 8
   #   cluster: true
 
-  # - nodeType: proxysql
-  #   nodeGroup: proxy
-  #   count: 2
-  #   cloudlets: 16
-  #   fixedCloudlets: 3
+  - nodeType: proxysql
+    nodeGroup: proxy
+    count: 2
+    cloudlets: 16
+    fixedCloudlets: 3
+    displayName: ProxySQL
 
   - nodeType: dockerengine
     cloudlets: 32
@@ -90,13 +91,19 @@ nodes:
     tag: 20.10.21
     count: 2
     nodeGroup: worker
+    displayName: MySQL Nodes
 
 onInstall:
   - install: /addons/docker-swarm-init.yml
   - get-tokens
   - pull-bitnami-mariadb
   - setup-docker-stack
-
+  - install: /scripts/proxysql-setup.yml
+    settings:
+      db_root_password: ${globals.MARIADB_ROOT_PASSWORD}
+      replication_user: ${globals.REPLICATION_USER}
+      replication_password: ${globals.REPLICATION_PASSWORD}
+      path: ${baseUrl}
 actions:
   get-tokens:
     - cmd[${nodes.vps.master.id}]: docker swarm join-token -q worker
