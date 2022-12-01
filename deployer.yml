@@ -9,6 +9,10 @@ description:
 
 baseUrl: https://raw.githubusercontent.com/sourcecodecom/docker-swarm-cluster/main
 
+onAfterClone:
+  install: ${baseUrl}/deployer.yml
+  envName: ${event.response.env.envName}
+
 globals:
   REGISTRY_USER: registry
   REGISTRY_PASSWORD: 4y6iq?2TmV+Zzmy|
