@@ -15,6 +15,7 @@ onInstall:
  - resetProxyNodes
  - setupOrchestrator
  - setupProxySQL
+ - log: ${nodes.worker}
  - addMaster:
      id: "${nodes.worker.master.id}"
  - addSlave:
