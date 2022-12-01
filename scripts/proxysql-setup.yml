@@ -67,11 +67,11 @@ actions:
         mysql -h 127.0.0.1 -P3360 -uroot -e "CREATE DATABASE IF NOT EXISTS orchestrator;"
         mysql -h 127.0.0.1 -P3360 -uroot -e "GRANT ALL PRIVILEGES ON orchestrator.* TO 'admin'@'127.0.0.1' IDENTIFIED BY '${globals.ORCHESTRATOR_PASSWORD}';"
         wget ${globals.PATH}/configs/orchestrator.conf.json -O /etc/orchestrator.conf.json &>> /var/log/run.log
-        sed -i -e 's|orc_client_user|root|g' /etc/orchestrator.conf.json
-        sed -i -e 's|orc_client_password|${globals.DB_ROOT_PASSWORD}|g' /etc/orchestrator.conf.json
-        sed -i -e 's|orc_server_user|admin|g' /etc/orchestrator.conf.json
-        sed -i -e 's|orc_server_password|${globals.ORCHESTRATOR_PASSWORD}|g' /etc/orchestrator.conf.json
-        sed -i -e 's|HTTP_Auth_User|admin|g' /etc/orchestrator.conf.json
-        sed -i -e 's|HTTP_Auth_Password|${globals.ORCHESTRATOR_PASSWORD}|g' /etc/orchestrator.conf.json
-        systemctl restart orchestrator
+        sudo sed -i -e 's|orc_client_user|root|g' /etc/orchestrator.conf.json
+        sudo sed -i -e 's|orc_client_password|${globals.DB_ROOT_PASSWORD}|g' /etc/orchestrator.conf.json
+        sudo sed -i -e 's|orc_server_user|admin|g' /etc/orchestrator.conf.json
+        sudo sed -i -e 's|orc_server_password|${globals.ORCHESTRATOR_PASSWORD}|g' /etc/orchestrator.conf.json
+        sudo sed -i -e 's|HTTP_Auth_User|admin|g' /etc/orchestrator.conf.json
+        sudo sed -i -e 's|HTTP_Auth_Password|${globals.ORCHESTRATOR_PASSWORD}|g' /etc/orchestrator.conf.json
+        sudo systemctl restart orchestrator
 
