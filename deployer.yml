@@ -94,11 +94,11 @@ nodes:
     displayName: MySQL Nodes
 
 onInstall:
-  - install: /addons/docker-swarm-init.yml
+  - install: addons/docker-swarm-init.yml
   - get-tokens
   - pull-bitnami-mariadb
   - setup-docker-stack
-  - install: /scripts/proxysql-setup.yml
+  - install: scripts/proxysql-setup.yml
     settings:
       db_root_password: ${globals.MARIADB_ROOT_PASSWORD}
       replication_user: ${globals.REPLICATION_USER}
