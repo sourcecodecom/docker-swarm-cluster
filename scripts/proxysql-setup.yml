@@ -17,7 +17,7 @@ onAfterScaleOut[vds]:
         id: "${@i.id}"
 
 onBeforeScaleIn[vds]:
-  forEach(event.response.nodes)
+  forEach(event.response.nodes):
     - removeSlave:
         id: "${@i.id}"
 
