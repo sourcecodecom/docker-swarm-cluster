@@ -1,0 +1,48 @@
+type: update
+id: setup-docker-stack
+name: Docker Stack
+baseUrl: https://raw.githubusercontent.com/sourcecodecom/docker-swarm-cluster/main/scripts
+
+globals:
+  REPLICATION_USER: ${settings.REPLICATION_USER}
+  REPLICATION_PASSWORD: ${settings.REPLICATION_PASSWORD}
+  MARIADB_ROOT_PASSWORD: ${settings.MARIADB_ROOT_PASSWORD}
+  MARIADB_MASTER_HOST: ${settings.MARIADB_MASTER_HOST}
+
+onAfterClone:
+  - install: ${baseUrl}/setup-docker-stack.yml
+    envName: ${event.response.env.envName}
+    settings:
+      clone: true
+
+onInstall:
+  - if (settings.clone: false):
+      - change-docker-config:
+          docker_master_hostname: ${nodes.vds[0].id}
+          docker_slave_hostname: ${nodes.vds[1].id}
+  - pull-bitnami-mariadb
+  - setup-docker-stack:
+      docker_master_hostname: ${nodes.vds[0].id}
+      docker_slave_hostname: ${nodes.vds[1].id}
+
+actions:
+  change-docker-config:
+    - cmd [${this.docker_master_hostname}]:
+      - sed -i "s/docker_master_hostname/node${this.docker_master_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
+      - sed -i "s/docker_slave_hostname/node${this.docker_slave_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
+      - docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
+  pull-bitnami-mariadb:
+    - cmd [${nodes.vps.master.id}]: docker pull bitnami/mariadb:10.1.29-r2
+
+  setup-docker-stack:
+    - cmd [${nodes.vps.master.id}]: |-
+        mkdir -p /opt/services/mysql-repl
+        wget ${baseUrl}/scripts/mysql-repl/docker-compose.yml -O /opt/services/mysql-repl/docker-compose.yml &>> /var/log/run.log
+        sed -i "s/replication_user/${globals.REPLICATION_USER}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/replication_password/${globals.REPLICATION_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/mariadb_root_password/${globals.MARIADB_ROOT_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/mariadb_master_host/${globals.MARIADB_MASTER_HOST}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/docker_master_hostname/node${this.docker_master_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
+        sed -i "s/docker_slave_hostname/node${this.docker_slave_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
+    
+    - cmd [${nodes.vps.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql

@@ -17,8 +17,6 @@ globals:
   REPLICATION_PASSWORD: repl12345
   MARIADB_ROOT_PASSWORD: test12345
   MARIADB_MASTER_HOST: mariadb-master
-  DOCKER_MASTER_HOSTNAME: ${nodes.vds[0].id}
-  DOCKER_SLAVE_HOSTNAME: ${nodes.vds[1].id}
   MARIADB_COMPOSE_FILE: /opt/services/mysql-repl/docker-compose.yml
 
 nodes:
@@ -96,8 +94,12 @@ nodes:
 onInstall:
   - install: addons/docker-swarm-init.yml
   - get-tokens
-  - pull-bitnami-mariadb
-  - setup-docker-stack
+  - install: scripts/setup-docker-stack.yml
+    settings:
+      replication_user: ${globals.REPLICATION_USER}
+      replication_password: ${globals.REPLICATION_PASSWORD}
+      mariadb_root_password: ${globals.MARIADB_ROOT_PASSWORD}
+      mariadb_master_host: ${globals.MARIADB_MASTER_HOST}
   - install: scripts/proxysql-setup.yml
     settings:
       db_root_password: ${globals.MARIADB_ROOT_PASSWORD}
@@ -109,22 +111,6 @@ actions:
     - cmd[${nodes.vps.master.id}]: docker swarm join-token -q worker
     - setGlobals:
         worker-token: ${response.out}
-
-  pull-bitnami-mariadb:
-    - cmd [${nodes.vps.master.id}]: docker pull bitnami/mariadb:10.1.29-r2
-
-  setup-docker-stack:
-    - cmd [${nodes.vps.master.id}]: |-
-        mkdir -p /opt/services/mysql-repl
-        wget ${baseUrl}/scripts/mysql-repl/docker-compose.yml -O /opt/services/mysql-repl/docker-compose.yml &>> /var/log/run.log
-        sed -i "s/replication_user/${globals.REPLICATION_USER}/" /opt/services/mysql-repl/docker-compose.yml
-        sed -i "s/replication_password/${globals.REPLICATION_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
-        sed -i "s/mariadb_root_password/${globals.MARIADB_ROOT_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
-        sed -i "s/mariadb_master_host/${globals.MARIADB_MASTER_HOST}/" /opt/services/mysql-repl/docker-compose.yml
-        sed -i "s/docker_master_hostname/node${globals.DOCKER_MASTER_HOSTNAME}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
-        sed -i "s/docker_slave_hostname/node${globals.DOCKER_SLAVE_HOSTNAME}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
-    
-    - cmd [${nodes.vps.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
 
 
 
