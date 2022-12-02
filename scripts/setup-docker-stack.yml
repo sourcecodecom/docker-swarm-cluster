@@ -4,10 +4,10 @@ name: Docker Stack
 baseUrl: https://raw.githubusercontent.com/sourcecodecom/docker-swarm-cluster/main/scripts
 
 globals:
-  REPLICATION_USER: ${settings.REPLICATION_USER}
-  REPLICATION_PASSWORD: ${settings.REPLICATION_PASSWORD}
-  MARIADB_ROOT_PASSWORD: ${settings.MARIADB_ROOT_PASSWORD}
-  MARIADB_MASTER_HOST: ${settings.MARIADB_MASTER_HOST}
+  REPLICATION_USER: ${settings.replication_user}
+  REPLICATION_PASSWORD: ${settings.replication_password}
+  MARIADB_ROOT_PASSWORD: ${settings.mariadb_root_password}
+  MARIADB_MASTER_HOST: ${settings.mariadb_master_host}
 
 onAfterClone:
   - install: ${baseUrl}/setup-docker-stack.yml
@@ -32,10 +32,10 @@ actions:
       - sed -i "s/docker_slave_hostname/node${this.docker_slave_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
       - docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
   pull-bitnami-mariadb:
-    - cmd [${nodes.vps.master.id}]: docker pull bitnami/mariadb:10.1.29-r2
+    - cmd [${nodes.vds.master.id}]: docker pull bitnami/mariadb:10.1.29-r2
 
   setup-docker-stack:
-    - cmd [${nodes.vps.master.id}]: |-
+    - cmd [${nodes.vds.master.id}]: |-
         mkdir -p /opt/services/mysql-repl
         wget ${baseUrl}/scripts/mysql-repl/docker-compose.yml -O /opt/services/mysql-repl/docker-compose.yml &>> /var/log/run.log
         sed -i "s/replication_user/${globals.REPLICATION_USER}/" /opt/services/mysql-repl/docker-compose.yml
@@ -45,4 +45,4 @@ actions:
         sed -i "s/docker_master_hostname/node${this.docker_master_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
         sed -i "s/docker_slave_hostname/node${this.docker_slave_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
     
-    - cmd [${nodes.vps.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
+    - cmd [${nodes.vds.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
