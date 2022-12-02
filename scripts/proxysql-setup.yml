@@ -30,7 +30,7 @@ onAfterClone:
   envName: ${event.response.env.envName}
   nodeGroup: vds
   settings:
-    db_root_password: ${globals.MARIADB_ROOT_PASSWORD}
+    db_root_password: ${globals.DB_ROOT_PASSWORD}
     replication_user: ${globals.REPLICATION_USER}
     replication_password: ${globals.REPLICATION_PASSWORD}
     path: ${baseUrl}
@@ -40,7 +40,7 @@ onAfterMigrate:
   envName: ${event.response.env.envName}
   nodeGroup: vds
   settings:
-    db_root_password: ${globals.MARIADB_ROOT_PASSWORD}
+    db_root_password: ${globals.DB_ROOT_PASSWORD}
     replication_user: ${globals.REPLICATION_USER}
     replication_password: ${globals.REPLICATION_PASSWORD}
     path: ${baseUrl}
