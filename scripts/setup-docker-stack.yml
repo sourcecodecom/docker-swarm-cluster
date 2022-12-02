@@ -16,10 +16,10 @@ onAfterClone:
       clone: true
 
 onInstall:
-  - if (${settings.clone: false}):
-      - change-docker-config:
-          docker_master_hostname: ${nodes.vds[0].id}
-          docker_slave_hostname: ${nodes.vds[1].id}
+  - if (${settings.clone:false}):
+    - change-docker-config:
+        docker_master_hostname: ${nodes.vds[0].id}
+        docker_slave_hostname: ${nodes.vds[1].id}
   - pull-bitnami-mariadb
   - setup-docker-stack:
       docker_master_hostname: ${nodes.vds[0].id}
