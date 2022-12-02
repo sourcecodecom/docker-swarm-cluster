@@ -16,7 +16,7 @@ onAfterClone:
       clone: true
 
 onInstall:
-  - if (${settings.clone}: false):
+  - if (${settings.clone: false}):
       - change-docker-config:
           docker_master_hostname: ${nodes.vds[0].id}
           docker_slave_hostname: ${nodes.vds[1].id}
