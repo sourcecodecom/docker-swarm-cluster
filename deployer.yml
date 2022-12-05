@@ -89,6 +89,7 @@ nodes:
     tag: 20.10.21
     count: 2
     nodeGroup: vds
+    scalingMode: STATEFUL
     displayName: MySQL Nodes
 
 onInstall:
