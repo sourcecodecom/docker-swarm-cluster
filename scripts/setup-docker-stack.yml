@@ -27,7 +27,7 @@ onInstall:
 
 actions:
   change-docker-config:
-    - cmd [${this.docker_master_hostname}]:
+    - cmd [${nodes.vps.master.id}]:
       - sed -i "s/docker_master_hostname/node${this.docker_master_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
       - sed -i "s/docker_slave_hostname/node${this.docker_slave_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
       - docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
