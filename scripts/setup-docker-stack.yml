@@ -14,6 +14,10 @@ onAfterClone:
     envName: ${event.response.env.envName}
     settings:
       clone: true
+      replication_user: ${globals.REPLICATION_USER}
+      replication_password: ${globals.REPLICATION_PASSWORD}
+      mariadb_root_password: ${globals.MARIADB_ROOT_PASSWORD}
+      mariadb_master_host: ${globals.MARIADB_MASTER_HOST}
 
 onInstall:
   # - if (${settings.clone:false}):
