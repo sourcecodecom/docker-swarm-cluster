@@ -45,4 +45,4 @@ actions:
         sed -i "s/docker_master_hostname/node${this.docker_master_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
         sed -i "s/docker_slave_hostname/node${this.docker_slave_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
     
-    - cmd [${nodes.vps.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
+    #- cmd [${nodes.vps.master.id}]: docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
