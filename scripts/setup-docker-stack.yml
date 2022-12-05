@@ -37,7 +37,7 @@ actions:
   setup-docker-stack:
     - cmd [${nodes.vps.master.id}]: |-
         mkdir -p /opt/services/mysql-repl
-        wget ${baseUrl}/scripts/mysql-repl/docker-compose.yml -O /opt/services/mysql-repl/docker-compose.yml &>> /var/log/run.log
+        wget ${baseUrl}/mysql-repl/docker-compose.yml -O /opt/services/mysql-repl/docker-compose.yml &>> /var/log/run.log
         sed -i "s/replication_user/${globals.REPLICATION_USER}/" /opt/services/mysql-repl/docker-compose.yml
         sed -i "s/replication_password/${globals.REPLICATION_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
         sed -i "s/mariadb_root_password/${globals.MARIADB_ROOT_PASSWORD}/" /opt/services/mysql-repl/docker-compose.yml
