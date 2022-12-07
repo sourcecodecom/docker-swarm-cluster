@@ -18,7 +18,9 @@ onAfterClone:
       replication_password: ${globals.REPLICATION_PASSWORD}
       mariadb_root_password: ${globals.MARIADB_ROOT_PASSWORD}
       mariadb_master_host: ${globals.MARIADB_MASTER_HOST}
-  - logging
+  - logging:
+      srcenv: ${event.params.srcenv}
+      targetenv: ${event.params.targetenv}
   
 
 
@@ -41,8 +43,8 @@ actions:
 
   logging:
    - log: "Environment Logging"
-   - log: ${srcenv}
-   - log: ${targetenv}
+   - log: ${this.srcenv}
+   - log: ${this.targetenv}
    - log: ${env.envName}
     
   pull-bitnami-mariadb:
