@@ -18,12 +18,10 @@ onAfterClone:
       replication_password: ${globals.REPLICATION_PASSWORD}
       mariadb_root_password: ${globals.MARIADB_ROOT_PASSWORD}
       mariadb_master_host: ${globals.MARIADB_MASTER_HOST}
-  - logging:
+  - cloneData:
       srcenv: ${event.params.srcenv}
       targetenv: ${event.params.targetenv}
   
-
-
 onInstall:
   # - if (${settings.clone:false}):
   #   - change-docker-config:
@@ -41,11 +39,26 @@ actions:
       - sed -i "s/docker_slave_hostname/node${this.docker_slave_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
       - docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
 
-  logging:
-   - log: "Environment Logging"
-   - log: ${this.srcenv}
-   - log: ${this.targetenv}
-   - log: ${env.envName}
+  cloneData:
+    - script: |
+        var envInfo, resp, groups, vdsnodes = [], onAfterReturn = { setGlobals: {} }, glbs = onAfterReturn.setGlobals;
+        envInfo = jelastic.env.control.getEnvInfo('${this.srcenv}', session);
+
+        for (var node = 0; nodes = envInfo.nodes; node < nodes.length; node++) {
+            if (nodes[node].nodeGroup === 'vds')
+              vdsnodes.push(nodes[node].id);
+        }
+
+        glbs["old_vdsnode0_id"] = vdsnodes[0];
+        glbs["old_vdsnode1_id"] = vdsnodes[1];
+
+        return { result: 0, onAfterReturn: onAfterReturn }
+
+    - setGlobals:
+        old_vdsnode0_id: ${globals.old_vdsnode0_id}
+        old_vdsnode1_id: ${globals.old_vdsnode1_id}
+
+    - cmd [${globals.old_vdsnode0_id}]: mkdir -p /opt/test
     
   pull-bitnami-mariadb:
     - cmd [${nodes.vps.master.id}]: docker pull bitnami/mariadb:10.1.29-r2
