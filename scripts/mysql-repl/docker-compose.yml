@@ -10,6 +10,8 @@ services:
     - MARIADB_REPLICATION_USER=replication_user
     - MARIADB_REPLICATION_PASSWORD=replication_password
     - MARIADB_ROOT_PASSWORD=mariadb_root_password
+    volumes:
+    - /opt/data:/bitnami/mariadb
     deploy:
       placement:
         constraints:

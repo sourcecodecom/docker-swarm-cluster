@@ -34,6 +34,7 @@ onAfterClone:
     replication_user: ${globals.REPLICATION_USER}
     replication_password: ${globals.REPLICATION_PASSWORD}
     path: ${baseUrl}
+    clone: true
 
 onAfterMigrate:
   install: ${globals.PATH}/scripts/proxysql-setup.yml
@@ -53,6 +54,8 @@ onInstall:
     id: "${nodes.vds[0].id}"
  - addSlave:
     id: "${nodes.vds[1].id}"
+ - if (${settings.clone:false}):
+    cmd [proxy]: sudo service proxysql restart 
 
 actions:
   addMaster:

@@ -91,10 +91,13 @@ nodes:
     nodeGroup: vds
     scalingMode: STATEFUL
     displayName: MySQL Nodes
+    volumes:
+    - /opt/data
 
 onInstall:
   - install: addons/docker-swarm-init.yml
   - get-tokens
+  - cmd[vds]: chown 1001:root /opt/data
   - install: scripts/setup-docker-stack.yml
     settings:
       replication_user: ${globals.REPLICATION_USER}
