@@ -19,6 +19,11 @@ globals:
   MARIADB_MASTER_HOST: mariadb-master
   MARIADB_COMPOSE_FILE: /opt/services/mysql-repl/docker-compose.yml
 
+onAfterClone:
+  log: ${srcenv}
+  log: ${targetenv}
+  log: ${env.envName}
+
 nodes:
   # - nodeType: nginx-dockerized
   #   nodeGroup: bl
