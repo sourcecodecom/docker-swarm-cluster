@@ -18,6 +18,9 @@ onAfterClone:
       replication_password: ${globals.REPLICATION_PASSWORD}
       mariadb_root_password: ${globals.MARIADB_ROOT_PASSWORD}
       mariadb_master_host: ${globals.MARIADB_MASTER_HOST}
+  - logging
+  
+
 
 onInstall:
   # - if (${settings.clone:false}):
@@ -35,6 +38,13 @@ actions:
       - sed -i "s/docker_master_hostname/node${this.docker_master_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
       - sed -i "s/docker_slave_hostname/node${this.docker_slave_hostname}-${env.domain}/" /opt/services/mysql-repl/docker-compose.yml
       - docker stack deploy -c /opt/services/mysql-repl/docker-compose.yml mysql
+
+  logging:
+   - log: "Environment Logging"
+   - log: ${srcenv}
+   - log: ${targetenv}
+   - log: ${env.envName}
+    
   pull-bitnami-mariadb:
     - cmd [${nodes.vps.master.id}]: docker pull bitnami/mariadb:10.1.29-r2
 
