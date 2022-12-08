@@ -45,7 +45,7 @@ actions:
         envInfo = jelastic.env.control.GetEnvInfo('${this.srcenv}', session);
 
         for (var node = 0, nodes = envInfo.nodes; node < nodes.length; node++) {
-            if (nodes[node].nodeGroup === 'vds')
+            if (nodes[node].nodeGroup == "vds")
               vdsnodes.push(nodes[node].id);
         }
 
