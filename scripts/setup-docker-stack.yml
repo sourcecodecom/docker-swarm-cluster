@@ -52,7 +52,7 @@ actions:
         glbs["old_vdsnode0_id"] = vdsnodes[0];
         glbs["old_vdsnode1_id"] = vdsnodes[1];
 
-        return { result: 0, onAfterReturn: onAfterReturn }
+        return { result: 0, onAfterReturn: onAfterReturn, arrayresult: vdsnodes }
 
     - setGlobals:
         old_vdsnode0_id: ${globals.old_vdsnode0_id}
